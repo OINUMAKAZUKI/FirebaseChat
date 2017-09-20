@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fitsSystemWindows="true"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#dfdfdf"
+        android:layout_marginBottom="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomBar"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_weight="0"
+        android:orientation="horizontal"
+        android:background="#ffffff">
+
+        <ImageView
+            android:id="@+id/sendImageImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="1px"
+            android:layout_marginTop="1px"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_menu_today"
+            android:contentDescription="@string/send"/>
+
+        <EditText
+            android:id="@+id/sendEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:hint="@string/hint_send_message"
+            android:background="@android:color/transparent"
+            android:maxLines="6"/>
+
+        <ImageView
+            android:id="@+id/sendTextImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="1px"
+            android:layout_marginTop="1px"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_menu_send"
+            android:contentDescription="@string/send" />
+    </LinearLayout>
+</LinearLayout>
