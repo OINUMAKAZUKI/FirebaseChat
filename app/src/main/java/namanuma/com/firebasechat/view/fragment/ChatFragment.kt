@@ -22,6 +22,7 @@ import namanuma.com.firebasechat.model.User
 import namanuma.com.firebasechat.view.adapter.ChatAdapter
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.FirebaseStorage
@@ -43,6 +44,7 @@ class ChatFragment : Fragment() {
     private var adapter: ChatAdapter? = null
     private var database: DatabaseReference? = null
     private var storage: FirebaseStorage? = null
+    private var analytics: FirebaseAnalytics? = null
     private var auth: FirebaseAuth? = null
     private var chats = mutableListOf<Chat>()
     private var userId = ""
@@ -67,6 +69,9 @@ class ChatFragment : Fragment() {
 
         // Storage 初期化
         storage = FirebaseStorage.getInstance()
+
+        // Analytics 初期化
+        analytics = FirebaseAnalytics.getInstance(activity)
 
         // Auth 初期化
         auth = FirebaseAuth.getInstance()
@@ -126,6 +131,8 @@ class ChatFragment : Fragment() {
                 adapter?.notifyDataSetChanged()
             }
         }
+
+        analytics?.setCurrentScreen(activity, "チャット画面", null)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -148,6 +155,9 @@ class ChatFragment : Fragment() {
 
         database?.updateChildren(childUpdates)
         editText?.text?.clear()
+
+        // Analytics
+        analytics?.logEvent("send_message", null)
     }
 
     private fun uploadImage(uri: Uri?, user: User?) {
@@ -170,6 +180,9 @@ class ChatFragment : Fragment() {
                     childUpdates.put("/user-chats/$userId/$key", postValues)
 
                     database?.updateChildren(childUpdates)
+
+                    // Analytics
+                    analytics?.logEvent("send_image", null)
                 }
             }
         }

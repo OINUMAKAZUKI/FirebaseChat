@@ -30,6 +30,7 @@ import namanuma.com.firebasechat.R
 import android.Manifest.permission.READ_CONTACTS
 import android.util.Log
 import android.widget.*
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.DatabaseReference
@@ -43,6 +44,7 @@ class LoginActivity : AppCompatActivity() {
     private var progressView: View? = null
     private var auth: FirebaseAuth? = null
     private var database: DatabaseReference? = null
+    private var analytics: FirebaseAnalytics? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,12 +55,18 @@ class LoginActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
+        analytics = FirebaseAnalytics.getInstance(this)
 
         val signInButton = findViewById(R.id.signInButton) as Button
         signInButton.setOnClickListener {
             attemptLogin()
         }
 
+    }
+
+    public override fun onResume() {
+        super.onResume()
+        analytics?.setCurrentScreen(this, "ログイン画面", null)
     }
 
     private fun attemptLogin() {
@@ -105,6 +113,8 @@ class LoginActivity : AppCompatActivity() {
                 if (it.isSuccessful) {
                     Toast.makeText(context, "successful", Toast.LENGTH_SHORT).show()
                     createUser(it.result.user.uid, name)
+                    // Analytics
+                    analytics?.logEvent(FirebaseAnalytics.Event.LOGIN, null)
                     finish()
                 } else {
                     Toast.makeText(context, "error:" + it.exception!!.localizedMessage, Toast.LENGTH_SHORT).show()
