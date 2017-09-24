@@ -61,14 +61,14 @@ class UserFragment : Fragment() {
         })
         button?.setOnClickListener {
             editText?.let {
-                writeNewUser(userId, it.text.toString())
+                writeNewUser(userId.toString(), it.text.toString())
             }
         }
 
     }
 
-    private fun writeNewUser(id: Int, name: String) {
+    private fun writeNewUser(id: String, name: String) {
         val user = User(id, name)
-        database?.child("users")?.child(id.toString())?.setValue(user)
+        database?.child("users")?.child(id)?.setValue(user)
     }
 }

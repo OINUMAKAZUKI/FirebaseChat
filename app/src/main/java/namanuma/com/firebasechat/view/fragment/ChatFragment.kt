@@ -22,9 +22,11 @@ import namanuma.com.firebasechat.model.User
 import namanuma.com.firebasechat.view.adapter.ChatAdapter
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.FirebaseStorage
 import java.io.File
+import java.net.Authenticator
 import java.net.URI
 
 
@@ -41,6 +43,7 @@ class ChatFragment : Fragment() {
     private var adapter: ChatAdapter? = null
     private var database: DatabaseReference? = null
     private var storage: FirebaseStorage? = null
+    private var auth: FirebaseAuth? = null
     private var chats = mutableListOf<Chat>()
     private var userId = ""
 
@@ -49,9 +52,6 @@ class ChatFragment : Fragment() {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // uid 取得
-        userId = Process.myUid().toString()
 
         // view の初期化
         view?.let {
@@ -67,6 +67,10 @@ class ChatFragment : Fragment() {
 
         // Storage 初期化
         storage = FirebaseStorage.getInstance()
+
+        // Auth 初期化
+        auth = FirebaseAuth.getInstance()
+        userId = auth?.currentUser?.uid ?: "none"
 
         adapter = ChatAdapter(activity)
         adapter?.userId = userId
@@ -110,6 +114,20 @@ class ChatFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // ログインした後に、UserId を再取得
+        auth?.let {
+            it.currentUser?.let {
+                userId = it.uid
+                adapter?.let {
+                    it.userId = userId
+                }
+                adapter?.notifyDataSetChanged()
+            }
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -121,7 +139,7 @@ class ChatFragment : Fragment() {
 
     private fun writeNewPost(user: User, message: String) {
         val key = database?.child("chats")?.push()?.key ?: ""
-        val chat = Chat(key, user.name, user.id.toString(), System.currentTimeMillis(), message)
+        val chat = Chat(key, user.name, user.id, System.currentTimeMillis(), message)
         val postValues = chat.toMap()
         val childUpdates = HashMap<String, Any>()
         val userId = chat.userId
@@ -145,7 +163,7 @@ class ChatFragment : Fragment() {
             }?.addOnSuccessListener {
                 val imagePath: String = it.downloadUrl?.toString() ?: ""
                 user?.let {
-                    val chat = Chat(key, user.name, user.id.toString(), System.currentTimeMillis(), "", imagePath)
+                    val chat = Chat(key, user.name, user.id, System.currentTimeMillis(), "", imagePath)
                     val childUpdates = HashMap<String, Any>()
                     val postValues = chat.toMap()
                     childUpdates.put("/chats/$key", postValues)

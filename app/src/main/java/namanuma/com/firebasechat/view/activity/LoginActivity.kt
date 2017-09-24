@@ -22,36 +22,43 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.inputmethod.EditorInfo
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 
 import java.util.ArrayList
 
 import namanuma.com.firebasechat.R
 
 import android.Manifest.permission.READ_CONTACTS
+import android.util.Log
+import android.widget.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import namanuma.com.firebasechat.model.User
 
 class LoginActivity : AppCompatActivity() {
 
     // UI references.
-    private var userNameView: AutoCompleteTextView? = null
-    private var mProgressView: View? = null
-    private var mLoginFormView: View? = null
+    private var userNameView: EditText? = null
+    private var progressView: View? = null
+    private var auth: FirebaseAuth? = null
+    private var database: DatabaseReference? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        // Set up the login form.
-        userNameView = findViewById(R.id.userName) as AutoCompleteTextView
+
+        userNameView = findViewById(R.id.userName) as EditText
+        progressView = findViewById(R.id.loginProgress)
+
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance().reference
 
         val signInButton = findViewById(R.id.signInButton) as Button
-        signInButton.setOnClickListener { attemptLogin() }
+        signInButton.setOnClickListener {
+            attemptLogin()
+        }
 
-        mLoginFormView = findViewById(R.id.loginForm)
-        mProgressView = findViewById(R.id.loginProgress)
     }
 
     private fun attemptLogin() {
@@ -74,34 +81,56 @@ class LoginActivity : AppCompatActivity() {
         if (cancel) {
             focusView!!.requestFocus()
         } else {
-            showProgress(true)
+            login(name)
         }
+    }
+
+    private fun login(email: String, password: String) {
+        auth?.let {
+            it.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener {
+                        if (it.isSuccessful) {
+
+                        }
+                    }
+        }
+    }
+
+    private fun login(name: String) {
+        val context = this
+        showProgress(true)
+        auth?.let {
+            it.signInAnonymously().addOnCompleteListener {
+                showProgress(false)
+                if (it.isSuccessful) {
+                    Toast.makeText(context, "successful", Toast.LENGTH_SHORT).show()
+                    createUser(it.result.user.uid, name)
+                    finish()
+                } else {
+                    Toast.makeText(context, "error:" + it.exception!!.localizedMessage, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun createUser(id: String, name: String) {
+        val user = User(id, name)
+        database?.child("users")?.child(id)?.setValue(user)
     }
 
     private fun showProgress(show: Boolean) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             val shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime)
 
-            mLoginFormView!!.visibility = if (show) View.GONE else View.VISIBLE
-            mLoginFormView!!.animate().setDuration(shortAnimTime.toLong()).alpha(
-                    (if (show) 0 else 1).toFloat()).setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    mLoginFormView!!.visibility = if (show) View.GONE else View.VISIBLE
-                }
-            })
-
-            mProgressView!!.visibility = if (show) View.VISIBLE else View.GONE
-            mProgressView!!.animate().setDuration(shortAnimTime.toLong()).alpha(
+            progressView!!.visibility = if (show) View.VISIBLE else View.GONE
+            progressView!!.animate().setDuration(shortAnimTime.toLong()).alpha(
                     (if (show) 1 else 0).toFloat()).setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    mProgressView!!.visibility = if (show) View.VISIBLE else View.GONE
+                    progressView!!.visibility = if (show) View.VISIBLE else View.GONE
                 }
             })
         } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView!!.visibility = if (show) View.VISIBLE else View.GONE
-            mLoginFormView!!.visibility = if (show) View.GONE else View.VISIBLE
+            progressView!!.visibility = if (show) View.VISIBLE else View.GONE
         }
     }
 }

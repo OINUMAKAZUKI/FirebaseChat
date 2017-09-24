@@ -5,11 +5,11 @@ package namanuma.com.firebasechat.model
  */
 class User() {
 
-    constructor(id: Int, name: String) : this() {
+    constructor(id: String, name: String) : this() {
         this.id = id
         this.name = name
     }
 
-    var id: Int = 0
+    var id: String = ""
     var name: String = ""
 }
