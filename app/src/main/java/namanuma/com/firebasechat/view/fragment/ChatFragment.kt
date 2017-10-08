@@ -5,30 +5,23 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Process
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
 import namanuma.com.firebasechat.R
 import namanuma.com.firebasechat.model.Chat
 import namanuma.com.firebasechat.model.User
 import namanuma.com.firebasechat.view.adapter.ChatAdapter
-import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.FirebaseStorage
-import java.io.File
-import java.net.Authenticator
-import java.net.URI
 
 
 /**
@@ -108,7 +101,9 @@ class ChatFragment : Fragment() {
         sendText?.setOnClickListener {
             editText?.let {
                 if (it.text.isNotEmpty()) {
-                    database?.child("users")?.child(userId)?.addListenerForSingleValueEvent(postListener(it.text.toString()))
+                    database?.child("users")?.
+                            child(userId)?.
+                            addListenerForSingleValueEvent(postListener(it.text.toString()))
                 }
             }
         }
@@ -145,15 +140,23 @@ class ChatFragment : Fragment() {
     }
 
     private fun writeNewPost(user: User, message: String) {
+        // チャットを判断するためのkey を取得
         val key = database?.child("chats")?.push()?.key ?: ""
+        // チャットモデルの生成
         val chat = Chat(key, user.name, user.id, System.currentTimeMillis(), message)
+        // RealTime Databaseで扱えるように、マッピング
         val postValues = chat.toMap()
-        val childUpdates = HashMap<String, Any>()
         val userId = chat.userId
+
+        // 複数送信するために必要
+        val childUpdates = HashMap<String, Any>()
         childUpdates.put("/chats/$key", postValues)
         childUpdates.put("/user-chats/$userId/$key", postValues)
 
+        // RealTime Databaseに保存(送信)
         database?.updateChildren(childUpdates)
+
+        // EditText の文言を初期化
         editText?.text?.clear()
 
         // Analytics
@@ -169,8 +172,10 @@ class ChatFragment : Fragment() {
             val mountainsRef = storageRef?.child("chats/$key/$pathName")
             val uploadTask = mountainsRef?.putFile(it)
             uploadTask?.addOnFailureListener {
+                // エラー
                 it.printStackTrace()
             }?.addOnSuccessListener {
+                // 画像送信が成功した時
                 val imagePath: String = it.downloadUrl?.toString() ?: ""
                 user?.let {
                     val chat = Chat(key, user.name, user.id, System.currentTimeMillis(), "", imagePath)
@@ -248,6 +253,7 @@ class ChatFragment : Fragment() {
             override fun onChildMoved(p0: DataSnapshot?, p1: String?) {
             }
 
+            // 変更時
             override fun onChildChanged(p0: DataSnapshot?, p1: String?) {
                 val chat = p0?.getValue(Chat::class.java)
                 val id = chat?.id ?: 0
@@ -257,6 +263,7 @@ class ChatFragment : Fragment() {
                 adapter?.notifyDataSetChanged()
             }
 
+            // 追加時
             override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
                 val chat = p0?.getValue(Chat::class.java)
                 chat?.let {
@@ -268,6 +275,7 @@ class ChatFragment : Fragment() {
                 (recyclerView?.layoutManager as LinearLayoutManager).scrollToPosition(chats.size - 1)
             }
 
+            // 削除時
             override fun onChildRemoved(p0: DataSnapshot?) {
                 val chat = p0?.getValue(Chat::class.java)
                 val id = chat?.id ?: 0

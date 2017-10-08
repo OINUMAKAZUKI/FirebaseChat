@@ -2,39 +2,19 @@ package namanuma.com.firebasechat.view.activity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.annotation.TargetApi
-import android.content.pm.PackageManager
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
-import android.app.LoaderManager.LoaderCallbacks
-
-import android.content.CursorLoader
-import android.content.Loader
-import android.database.Cursor
-import android.net.Uri
-import android.os.AsyncTask
-
 import android.os.Build
 import android.os.Bundle
-import android.provider.ContactsContract
+import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
-import android.view.KeyEvent
 import android.view.View
-import android.view.View.OnClickListener
-import android.view.inputmethod.EditorInfo
-
-import java.util.ArrayList
-
-import namanuma.com.firebasechat.R
-
-import android.Manifest.permission.READ_CONTACTS
-import android.util.Log
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import namanuma.com.firebasechat.R
 import namanuma.com.firebasechat.model.User
 
 class LoginActivity : AppCompatActivity() {
@@ -53,8 +33,10 @@ class LoginActivity : AppCompatActivity() {
         userNameView = findViewById(R.id.userName) as EditText
         progressView = findViewById(R.id.loginProgress)
 
+        // 初期化
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
+
         analytics = FirebaseAnalytics.getInstance(this)
 
         val signInButton = findViewById(R.id.signInButton) as Button
