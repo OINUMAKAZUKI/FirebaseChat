@@ -1,20 +1,20 @@
 package namanuma.com.firebasechat.view
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
 import namanuma.com.firebasechat.R
 import namanuma.com.firebasechat.utils.FragmentType
 import namanuma.com.firebasechat.view.activity.LoginActivity
 import namanuma.com.firebasechat.view.fragment.ChatFragment
-import namanuma.com.firebasechat.view.fragment.UserFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,6 +35,8 @@ class MainActivity : AppCompatActivity() {
         viewPager?.addOnPageChangeListener(onPageChangeListener())
         tabLayout?.setupWithViewPager(viewPager, true)
         tabLayout?.visibility = View.GONE
+
+        openPush()
     }
 
     public override fun onStart() {
@@ -58,6 +60,19 @@ class MainActivity : AppCompatActivity() {
     private fun logout() {
         auth?.let {
             it.signOut()
+        }
+    }
+
+    private fun openPush() {
+        val url = intent.getStringExtra("URL") ?: return
+        url.let {
+            if (url.startsWith("http://") || url.startsWith("https://")) {
+                val uri = Uri.parse(url)
+                val intent = Intent(Intent.ACTION_VIEW, uri)
+                startActivity(intent)
+
+                intent.putExtra("URL", "")
+            }
         }
     }
 
