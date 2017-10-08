@@ -43,6 +43,7 @@ dependencies {
     compile 'com.google.firebase:firebase-storage:10.2.6'
     compile 'com.google.firebase:firebase-messaging:10.2.6'
     compile 'com.firebaseui:firebase-ui-storage:0.6.0'
+    compile 'com.google.firebase:firebase-config:10.2.6'
 }
 
 // add this at the bottom google services plugin

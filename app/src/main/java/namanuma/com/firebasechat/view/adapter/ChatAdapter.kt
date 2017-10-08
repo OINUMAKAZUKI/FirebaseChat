@@ -1,17 +1,18 @@
 package namanuma.com.firebasechat.view.adapter
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
+import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
-import com.firebase.ui.storage.images.FirebaseImageLoader
-import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import namanuma.com.firebasechat.R
 import namanuma.com.firebasechat.extension.time
 import namanuma.com.firebasechat.model.Chat
@@ -23,11 +24,10 @@ class ChatAdapter constructor(private var context: Context) : RecyclerView.Adapt
 
     var userId: String = ""
     var chats: List<Chat>? = null
-    var storage: FirebaseStorage? = null
-
-    init {
-        storage = FirebaseStorage.getInstance()
-    }
+    var adminUser: String = ""
+    var colorString: String = ""
+    var adminColorString: String = ""
+    var config: FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
 
     enum class ViewType {
         MY, YOU
@@ -60,12 +60,21 @@ class ChatAdapter constructor(private var context: Context) : RecyclerView.Adapt
 
     inner class ViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
 
+        var cardView: CardView = itemView?.findViewById(R.id.cardView) as CardView
         var chatText: TextView = itemView?.findViewById(R.id.chatText) as TextView
         var nameText: TextView = itemView?.findViewById(R.id.nameText) as TextView
         var timeText: TextView = itemView?.findViewById(R.id.timeText) as TextView
         var imageView: ImageView = itemView?.findViewById(R.id.imageView) as ImageView
+
         fun setup(chat: Chat?) {
+            remoteConfig()
+
             chat?.let {
+                if (it.userId == adminUser) {
+                    val color = Color.parseColor(adminColorString)
+                    cardView.cardBackgroundColor = ColorStateList.valueOf(color)
+                }
+
                 nameText.text = it.name
                 timeText.text = it.ctime.time
                 chatText.text = it.message
@@ -79,5 +88,14 @@ class ChatAdapter constructor(private var context: Context) : RecyclerView.Adapt
                 }
             }
         }
+    }
+
+    private fun remoteConfig() {
+        adminUser = config.getString("admin_user")
+        adminColorString = config.getString("admin_message_color")
+        colorString = config.getString("message_color")
+
+        adminUser = if (adminUser.isEmpty()) "xmuLhfqtq6Sfn6bcJWZiGTkT4oI3" else adminUser
+        adminColorString = if (adminColorString.isEmpty()) "#00ff00" else adminColorString
     }
 }
