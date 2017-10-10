@@ -8,7 +8,7 @@ import android.support.v4.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import namanuma.com.firebasechat.R
-import namanuma.com.firebasechat.view.MainActivity
+import namanuma.com.firebasechat.view.activity.WebViewActivity
 
 /**
  * Created by k.oinuma on 2017/09/29.
@@ -27,8 +27,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             setAutoCancel(true)
         }
 
+        val url = rm?.data?.get("URL") ?: ""
+
         // Tap to generate intent
-        val intent = Intent(this, MainActivity::class.java)
+        val intent = Intent(this, WebViewActivity::class.java)
+        intent.putExtra("URL", url)
+
         val pIntent: PendingIntent = PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         builder.setContentIntent(pIntent)
 
