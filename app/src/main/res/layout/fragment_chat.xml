@@ -6,13 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fitsSystemWindows="true"/>
-
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
@@ -21,6 +14,13 @@
         app:layout_constraintBottom_toTopOf="@+id/bottomBar"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fitsSystemWindows="true"/>
 
     <LinearLayout
         android:id="@+id/bottomBar"
@@ -34,10 +34,11 @@
             android:id="@+id/sendImageImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="1px"
-            android:layout_marginTop="1px"
+            android:layout_marginLeft="8dp"
             android:padding="8dp"
-            android:src="@android:drawable/ic_menu_today"
+            android:layout_gravity="center"
+            android:tint="@android:color/secondary_text_dark"
+            android:src="@drawable/ic_add_to_photos_white_24dp"
             android:contentDescription="@string/send"/>
 
         <EditText
@@ -56,10 +57,11 @@
             android:id="@+id/sendTextImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="1px"
-            android:layout_marginTop="1px"
+            android:layout_marginRight="8dp"
             android:padding="8dp"
-            android:src="@android:drawable/ic_menu_send"
+            android:layout_gravity="center"
+            android:tint="@android:color/secondary_text_dark"
+            android:src="@drawable/ic_send_white_24dp"
             android:contentDescription="@string/send" />
     </LinearLayout>
 </LinearLayout>
