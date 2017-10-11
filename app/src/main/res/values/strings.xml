@@ -14,4 +14,7 @@
 
     <string name="hint_send_message">メッセージを入力</string>
     <string name="send">送信</string>
+    <string name="decision">決定</string>
+    <string name="blank">未記入</string>
+    <string name="nickname">ニックネーム</string>
 </resources>

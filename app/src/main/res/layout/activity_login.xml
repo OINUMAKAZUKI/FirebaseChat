@@ -23,7 +23,7 @@
         android:id="@+id/userName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="ニックネーム"
+        android:hint="@string/nickname"
         android:inputType="textPersonName"
         android:maxLines="1" />
 
@@ -33,7 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="決定"
+        android:text="@string/decision"
         android:textStyle="bold" />
 
 </LinearLayout>
