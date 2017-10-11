@@ -19,7 +19,6 @@ import namanuma.com.firebasechat.model.User
 
 class LoginActivity : AppCompatActivity() {
 
-    // UI references.
     private var userNameView: EditText? = null
     private var progressView: View? = null
     private var auth: FirebaseAuth? = null
